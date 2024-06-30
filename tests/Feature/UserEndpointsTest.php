@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -45,6 +46,37 @@ class UserEndpointsTest extends TestCase
         $this->assertDatabaseHas("users", [
             "email" => "user@example.com",
         ]);
+    }
+
+    /** @test */
+    public function it_logs_in_a_user()
+    {
+        $user = $this->getUser();
+
+        $loginData = [
+            "email" => "user@example.com",
+            "password" => "userpassword",
+        ];
+
+        $response = $this->postJson("/api/v1/user/login", $loginData);
+
+        $response->assertStatus(200)
+                 ->assertJsonStructure([
+                    "success",
+                    "data" => [
+                        "token"
+                    ],
+                    "error",
+                    "errors",
+                    "extra",
+                 ]);
+    }
+
+    private function getUser(): User
+    {
+        $user = User::factory()->create($this->getUserData());
+
+        return $user;
     }
 
     private function getUserData(): array
