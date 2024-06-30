@@ -79,7 +79,7 @@ class UserEndpointsTest extends TestCase
 
         $token = $this->authenticate($user);
 
-        $response = $this->getJson('/api/v1/user/logout', ['Authorization' => "Bearer {$token}"]);
+        $response = $this->getJson("/api/v1/user/logout", ["Authorization" => "Bearer {$token}"]);
 
         $response->assertStatus(200)
                 ->assertJsonStructure([
@@ -89,6 +89,27 @@ class UserEndpointsTest extends TestCase
                     "errors",
                     "extra",
                 ]);
+    }
+
+    /** @test */
+    public function it_returns_the_logged_in_user()
+    {
+        $user = $this->getUser();
+
+        $token = $this->authenticate($user);
+        $response = $this->getJson("/api/v1/user", ["Authorization" => "Bearer {$token}"]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                "success",
+                "data" => [
+                    "uuid",
+                    "email"
+                ],
+                "error",
+                "errors",
+                "extra",
+            ]);
     }
 
     protected function authenticate(User $user): string

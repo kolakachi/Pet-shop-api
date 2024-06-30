@@ -86,6 +86,25 @@ class UserController extends Controller
         }
     }
 
+    public function getUser(): JsonResponse
+    {
+        try{
+            $token = request()->bearerToken();
+            $user = $this->jwtService->getUserFromToken($token);
+            if (!$user) {
+                $data = $this->getJsonResponseData(0, [], "Unauthorized");
+                return response()->json($data, 401);
+            }
+
+            $data = $this->getJsonResponseData(1, $user->toArray());
+            return response()->json($data, 200);
+
+        }catch (Exception $error) {
+            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            return response()->json($data, 500);
+        }
+    }
+
     protected function getJsonResponseData(
         int $success, array $data = [],
         string $error = "", array $errors = [], array $extra = []): array
