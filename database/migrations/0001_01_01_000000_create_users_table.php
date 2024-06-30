@@ -12,13 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
+            $table->id()->comment('autoincrement');
+            $table->string('uuid')->unique()->comment('UUID to allow easy migration between environments without breaking FK in the logic');
+            $table->string('first_name');
+            $table->string('last_name');
+            $table->boolean('is_admin')->default(false)->comment('default (0)');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('email_verified_at')->nullable()->comment('nullable');
             $table->string('password');
-            $table->rememberToken();
+            $table->string('avatar')->nullable()->comment('nullable, UUID of the image stored in the the files table');
+            $table->string('address');
+            $table->string('phone_number');
+            $table->boolean('is_marketing')->default(false)->comment('Enable marketing preferences: default (0)');
             $table->timestamps();
+            $table->timestamp('last_login_at')->nullable()->comment('nullable');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
