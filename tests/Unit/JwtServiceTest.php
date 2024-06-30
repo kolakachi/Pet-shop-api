@@ -20,7 +20,7 @@ class JwtServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_can_generate_a_token()
+    public function itCanGenerateAToken()
     {
         $user = User::factory()->create();
         $token = $this->jwtService->generateToken($user);
@@ -30,7 +30,7 @@ class JwtServiceTest extends TestCase
     }
 
     /** @test */
-    public function it_can_parse_a_token()
+    public function itCanParseAToken()
     {
         $user = User::factory()->create();
         $token = $this->jwtService->generateToken($user);
