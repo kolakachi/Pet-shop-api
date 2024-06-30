@@ -30,15 +30,7 @@ class JwtService
 
     public function generateToken(User $user, string $tokenTitle = null, array $restrictions = null, array $permissions = null): Plain
     {
-        $appURL = config('app.url');
-        $now = new \DateTimeImmutable();
-        $token = $this->config->builder()
-            ->issuedBy($appURL)
-            ->issuedAt($now)
-            ->canOnlyBeUsedAfter($now)
-            ->expiresAt($now->modify('+1 hour'))
-            ->withClaim('user_uuid', $user->uuid)
-            ->getToken($this->config->signer(), $this->config->signingKey());
+        $token = $this->buildToken($user);
 
         JwtToken::create([
             'user_id' => $user->id,
@@ -84,5 +76,25 @@ class JwtService
 
         $userId = $parsedToken->claims()->get('user_uuid');
         return User::where('uuid',$userId)->first();
+    }
+
+    public function generateTokenForPasswordReset(User $user)
+    {
+        return $this->buildToken($user);
+    }
+
+    private function buildToken(User $user): Plain
+    {
+        $appURL = config('app.url');
+        $now = new \DateTimeImmutable();
+        $token = $this->config->builder()
+            ->issuedBy($appURL)
+            ->issuedAt($now)
+            ->canOnlyBeUsedAfter($now)
+            ->expiresAt($now->modify('+1 hour'))
+            ->withClaim('user_uuid', $user->uuid)
+            ->getToken($this->config->signer(), $this->config->signingKey());
+
+        return $token;
     }
 }
