@@ -105,6 +105,29 @@ class UserController extends Controller
         }
     }
 
+    public function deleteUser(): JsonResponse
+    {
+        try{
+            $token = request()->bearerToken();
+            $user = $this->jwtService->getUserFromToken($token);
+            if (!$user) {
+                $data = $this->getJsonResponseData(0, [], "Unauthorized");
+                return response()->json($data, 401);
+            }
+
+            $parsedToken = $this->jwtService->parseToken($token);
+            $this->jwtService->deleteToken($parsedToken);
+
+            $user->delete();
+            $data = $this->getJsonResponseData(1);
+            return response()->json($data, 200);
+        }catch (Exception $error) {
+            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            return response()->json($data, 500);
+        }
+
+    }
+
     protected function getJsonResponseData(
         int $success, array $data = [],
         string $error = "", array $errors = [], array $extra = []): array

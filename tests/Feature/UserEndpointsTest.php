@@ -112,6 +112,29 @@ class UserEndpointsTest extends TestCase
             ]);
     }
 
+    /** @test */
+    public function it_deletes_the_logged_in_user()
+    {
+        $user = $this->getUser();
+
+        $token = $this->authenticate($user);
+
+        $response = $this->deleteJson("/api/v1/user", [], ["Authorization" => "Bearer {$token}"]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                "success",
+                "data",
+                "error",
+                "errors",
+                "extra",
+            ]);
+
+        $this->assertDatabaseMissing("users", [
+            "email" => "user@example.com",
+        ]);
+    }
+
     protected function authenticate(User $user): string
     {
         $token = $this->jwtService->generateToken($user);
