@@ -135,6 +135,39 @@ class UserEndpointsTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function it_edits_user_details()
+    {
+        $user = $this->getUser();
+
+        $token = $this->authenticate($user);
+
+        $editUser = $user->toArray();
+
+        $editUser["first_name"] = "Johnny";
+        $editUser["last_name"] = "Cash";
+        $editUser["password"] = Hash::make("userpasswordchange");
+        $editUser["password_confirmation"] = $editUser["password"];
+        $editUser["email"] = "john.cash@example.com";
+
+        $response = $this->putJson("/api/v1/user/edit", $editUser, ["Authorization" => "Bearer {$token}"]);
+
+        $response->assertStatus(200)
+                ->assertJsonStructure([
+                    "success",
+                    "data",
+                    "error",
+                    "errors",
+                    "extra",
+                ]);
+
+        $this->assertDatabaseHas("users", [
+            "email" => "john.cash@example.com",
+            "first_name" => "Johnny",
+            "last_name" => "Cash",
+        ]);
+    }
+
     protected function authenticate(User $user): string
     {
         $token = $this->jwtService->generateToken($user);
