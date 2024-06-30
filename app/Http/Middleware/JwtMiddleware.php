@@ -34,6 +34,7 @@ class JwtMiddleware
             if (!$user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
+            $request->attributes->set('user', $user);
         } catch (Exception $e) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }

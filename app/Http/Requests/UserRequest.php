@@ -25,7 +25,7 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules =  [
             "first_name" => "required|string|max:255",
             "last_name" => "required|string|max:255",
             "email" => "required|string|email|max:255|unique:users",
@@ -34,6 +34,12 @@ class UserRequest extends FormRequest
             "address" => "required|string|max:255",
             "phone_number" => "required|string|max:20",
         ];
+        $user = request()->attributes->get("user");
+        if($user){
+            $rules["email"] = "required|string|email|max:255|unique:users,email," . $user->id;
+        }
+
+        return $rules;
     }
 
     protected function failedValidation(Validator $validator): void
