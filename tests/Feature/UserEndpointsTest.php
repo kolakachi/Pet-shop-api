@@ -168,6 +168,45 @@ class UserEndpointsTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function it_allows_password_reset()
+    {
+        $user = $this->getUser();
+
+        $response = $this->postJson('/api/v1/user/forgot-password', [
+            'email' => 'user@example.com',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                "success",
+                "data" => [
+                    "reset_token"
+                ],
+                "error",
+                "errors",
+                "extra",
+            ]);
+        $responseData = json_decode($response->getContent());
+        $token = $responseData->data->reset_token;
+        $this->assertNotNull($token);
+
+        $resetResponse = $this->postJson('/api/v1/user/reset-password-token', [
+            'email' => 'user@example.com',
+            'token' => $token,
+            'password' => 'newpassword',
+            'password_confirmation' => 'newpassword',
+        ]);
+        $resetResponse->assertStatus(200)
+                  ->assertJson([
+                        'data' => [
+                            'message' => 'Password has been successfully updated',
+                        ]
+                  ]);
+
+        $this->assertTrue(Hash::check('newpassword', $user->fresh()->password));
+    }
+
     protected function authenticate(User $user): string
     {
         $token = $this->jwtService->generateToken($user);

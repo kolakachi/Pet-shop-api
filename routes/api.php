@@ -14,4 +14,6 @@ Route::prefix('v1')->group(function () {
     });
     Route::post('user/create', [UserController::class, 'create']);
     Route::post('user/login', [UserController::class, 'login']);
+    Route::post('user/forgot-password', [UserController::class, 'forgotPassword']);
+    Route::post('user/reset-password-token', [UserController::class, 'resetPasswordToken']);
 });

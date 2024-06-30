@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use Exception;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
@@ -134,13 +135,90 @@ class UserController extends Controller
             $token = request()->bearerToken();
             $user = $this->jwtService->getUserFromToken($token);
             if (!$user) {
-                return response()->json(['error' => 'Unauthorized'], 401);
+                $data = $this->getJsonResponseData(0, [], "Unauthorized");
+                return response()->json($data, 401);
             }
             $user->update($request->validated());
             $data = $this->getJsonResponseData(1, $user->toArray());
             return response()->json($data, 200);
 
         } catch (Exception $error) {
+            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            return response()->json($data, 500);
+        }
+    }
+
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        try{
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|exists:users,email',
+            ]);
+            if ($validator->fails()) {
+                $data = $this->getJsonResponseData(
+                    0, [],
+                    "Failed Validation",
+                    $validator->errors()->toArray()
+                );
+                return response()->json($data, 422);
+            }
+
+            $user = User::where('email', $request->email)->first();
+            if (!$user) {
+                $data = $this->getJsonResponseData(0, [], "User not found");
+                return response()->json($data, 404);
+            }
+
+            $token = $this->jwtService->generateTokenForPasswordReset($user);
+            $data = $this->getJsonResponseData(1, [
+                "reset_token" => $token->toString(),
+            ]);
+
+            return response()->json($data, 200);
+
+        }catch (Exception $error) {
+            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            return response()->json($data, 500);
+        }
+    }
+
+    public function resetPasswordToken(Request $request): JsonResponse
+    {
+        try {
+
+            $validator = Validator::make($request->all(), [
+                'token' => 'required',
+                'email' => 'required|email|exists:users,email',
+                'password' => 'required|string|min:8',
+                "password_confirmation" => "required|same:password",
+            ]);
+            if ($validator->fails()) {
+                $data = $this->getJsonResponseData(
+                    0, [],
+                    "Failed Validation",
+                    $validator->errors()->toArray()
+                );
+                return response()->json($data, 422);
+            }
+
+            $token = $request->token;
+            $parsedToken = $this->jwtService->parseToken($token);
+            $userId = $parsedToken->claims()->get('user_uuid');
+
+            $user = User::where('uuid', $userId)->where('email', $request->email)->first();
+            if (!$user) {
+                $data = $this->getJsonResponseData( 0, [], "User not found");
+                return response()->json($data, 404);
+            }
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            $data = $this->getJsonResponseData(1, [
+                "message" => "Password has been successfully updated",
+            ]);
+
+            return response()->json($data, 200);
+        } catch (\Exception $error) {
             $data = $this->getJsonResponseData(0,[], $error->getMessage());
             return response()->json($data, 500);
         }
