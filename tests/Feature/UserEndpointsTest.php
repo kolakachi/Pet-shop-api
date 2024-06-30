@@ -61,7 +61,7 @@ class UserEndpointsTest extends TestCase
         $response = $this->postJson("/api/v1/user/login", $loginData);
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
+                ->assertJsonStructure([
                     "success",
                     "data" => [
                         "token"
@@ -69,7 +69,32 @@ class UserEndpointsTest extends TestCase
                     "error",
                     "errors",
                     "extra",
-                 ]);
+                ]);
+    }
+
+    /** @test */
+    public function it_logs_out_a_user()
+    {
+        $user = $this->getUser();
+
+        $token = $this->authenticate($user);
+
+        $response = $this->getJson('/api/v1/user/logout', ['Authorization' => "Bearer {$token}"]);
+
+        $response->assertStatus(200)
+                ->assertJsonStructure([
+                    "success",
+                    "data",
+                    "error",
+                    "errors",
+                    "extra",
+                ]);
+    }
+
+    protected function authenticate(User $user): string
+    {
+        $token = $this->jwtService->generateToken($user);
+        return $token->toString();
     }
 
     private function getUser(): User

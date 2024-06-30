@@ -31,21 +31,12 @@ class UserController extends Controller
             $token = $this->jwtService->generateToken($user);
             $user["token"] = $token;
 
-            return response()->json([
-                "success" => 1,
-                "data" => $user,
-                "error" => null,
-                "errors" => [],
-                "extra" => []
-            ], 200);
+            $data = $this->getJsonResponseData(1, $user->toArray());
+            return response()->json($data, 200);
+
         } catch (Exception $error) {
-            return response()->json([
-                "success" => 0,
-                "data" => [],
-                "error" => $error->getMessage(),
-                "errors" => [],
-                "extra" => []
-            ], 500);
+            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            return response()->json($data, 500);
         }
 
     }
@@ -59,29 +50,53 @@ class UserController extends Controller
             if ($user && Hash::check($credentials["password"], $user->password)) {
                 $token = $this->jwtService->generateToken($user);
 
-                return response()->json([
-                    "success" => 1,
-                    "data" => [
-                        "token" => $token->toString(),
-                    ],
-                    "error" => null,
-                    "errors" => [],
-                    "extra" => []
-                ], 200);
+                $data = $this->getJsonResponseData(1, [
+                    "token" => $token->toString(),
+                ]);
+                return response()->json($data, 200);
             }
 
-            return response()->json(["error" => "Unauthorized"], 401);
+            $data = $this->getJsonResponseData(0, [], "Unauthorized");
+            return response()->json($data, 401);
 
         }catch (Exception $error) {
-            return response()->json([
-                "success" => 0,
-                "data" => [],
-                "error" => $error->getMessage(),
-                "errors" => [],
-                "extra" => []
-            ], 500);
+            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            return response()->json($data, 500);
         }
 
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        try {
+            $token = $request->bearerToken();
+            if (!$token) {
+                $data = $this->getJsonResponseData(0, [], "Unauthorized");
+                return response()->json($data, 401);
+            }
+
+            $parsedToken = $this->jwtService->parseToken($token);
+            $this->jwtService->deleteToken($parsedToken);
+
+            $data = $this->getJsonResponseData(1);
+            return response()->json($data, 200);
+        } catch (Exception $error) {
+            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            return response()->json($data, 500);
+        }
+    }
+
+    protected function getJsonResponseData(
+        int $success, array $data = [],
+        string $error = "", array $errors = [], array $extra = []): array
+    {
+        return [
+            "success" => $success,
+            "data" => $data,
+            "error" => $error,
+            "errors" => $errors,
+            "extra" => $extra
+        ];
     }
 
 }
