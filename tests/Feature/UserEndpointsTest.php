@@ -21,7 +21,7 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function it_creates_a_new_user()
+    public function itCreatesANewUser()
     {
         $userData = $this->getUserData();
         $userData["password_confirmation"] = $userData["password"];
@@ -49,13 +49,13 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function it_logs_in_a_user()
+    public function itLogsInAUser()
     {
-        $user = $this->getUser();
+        $user = User::factory()->create();
 
         $loginData = [
-            "email" => "user@example.com",
-            "password" => "userpassword",
+            "email" => $user->email,
+            "password" => "password",
         ];
 
         $response = $this->postJson("/api/v1/user/login", $loginData);
@@ -73,9 +73,9 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function it_logs_out_a_user()
+    public function itLogsOutAUser()
     {
-        $user = $this->getUser();
+        $user = User::factory()->create();
 
         $token = $this->authenticate($user);
 
@@ -92,9 +92,9 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_the_logged_in_user()
+    public function itReturnsTheLoggedInUser()
     {
-        $user = $this->getUser();
+        $user = User::factory()->create();
 
         $token = $this->authenticate($user);
         $response = $this->getJson("/api/v1/user", ["Authorization" => "Bearer {$token}"]);
@@ -113,9 +113,9 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function it_deletes_the_logged_in_user()
+    public function itDeletesTheLoggedInUser()
     {
-        $user = $this->getUser();
+        $user = User::factory()->create();
 
         $token = $this->authenticate($user);
 
@@ -136,9 +136,9 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function it_edits_user_details()
+    public function itEditsUserDetails()
     {
-        $user = $this->getUser();
+        $user = User::factory()->create();
 
         $token = $this->authenticate($user);
 
@@ -169,12 +169,12 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function it_allows_password_reset()
+    public function itAllowsPasswordReset()
     {
-        $user = $this->getUser();
+        $user = User::factory()->create();
 
         $response = $this->postJson('/api/v1/user/forgot-password', [
-            'email' => 'user@example.com',
+            'email' => $user->email,
         ]);
 
         $response->assertStatus(200)
@@ -192,7 +192,7 @@ class UserEndpointsTest extends TestCase
         $this->assertNotNull($token);
 
         $resetResponse = $this->postJson('/api/v1/user/reset-password-token', [
-            'email' => 'user@example.com',
+            'email' => $user->email,
             'token' => $token,
             'password' => 'newpassword',
             'password_confirmation' => 'newpassword',
@@ -213,13 +213,6 @@ class UserEndpointsTest extends TestCase
         return $token->toString();
     }
 
-    private function getUser(): User
-    {
-        $user = User::factory()->create($this->getUserData());
-
-        return $user;
-    }
-
     private function getUserData(): array
     {
         return [
@@ -228,7 +221,7 @@ class UserEndpointsTest extends TestCase
             "last_name" => "Doe",
             "is_admin" => false,
             "email" => "user@example.com",
-            "password" => Hash::make("userpassword"),
+            "password" => Hash::make("password"),
             "address" => "New Road",
             "phone_number" => "+23490997465",
             "is_marketing" => true,
