@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
+use App\Models\PasswordReset;
 use App\Models\User;
 use App\Services\JwtService;
 use Exception;
@@ -676,8 +677,14 @@ class UserController extends Controller
             }
 
             $token = $this->jwtService->generateTokenForPasswordReset($user);
+            $tokenString = $token->toString();
+            PasswordReset::where('email', $user->email)->delete();
+            PasswordReset::create([
+                'email' => $user->email,
+                'token' => $tokenString,
+            ]);
             $data = $this->getJsonResponseData(1, [
-                'reset_token' => $token->toString(),
+                'reset_token' => $tokenString,
             ]);
 
             return response()->json($data, 200);
@@ -788,10 +795,18 @@ class UserController extends Controller
             }
 
             $token = $request->token;
-            $parsedToken = $this->jwtService->parseToken($token);
-            $userId = $parsedToken->claims()->get('user_uuid');
+            $tokenIsValid = PasswordReset::where('token', $token)->first();
+            if (! $tokenIsValid) {
+                $data = $this->getJsonResponseData(
+                    0, [],
+                    'Failed Validation',
+                    $validator->errors()->toArray()
+                );
 
-            $user = User::where('uuid', $userId)->where('email', $request->email)->first();
+                return response()->json($data, 422);
+            }
+
+            $user = User::where('email', $request->email)->first();
             if (! $user) {
                 $data = $this->getJsonResponseData(0, [], 'User not found');
 
@@ -799,6 +814,7 @@ class UserController extends Controller
             }
             $user->password = Hash::make($request->password);
             $user->save();
+            $tokenIsValid->delete();
 
             $data = $this->getJsonResponseData(1, [
                 'message' => 'Password has been successfully updated',
