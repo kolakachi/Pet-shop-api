@@ -22,7 +22,7 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function itCreatesANewUser()
+    public function it_creates_a_new_user()
     {
         $userData = $this->getUserData();
         $userData['password_confirmation'] = $userData['password'];
@@ -50,7 +50,7 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function itLogsInAUser()
+    public function it_logs_in_a_user()
     {
         $user = User::factory()->create();
 
@@ -74,7 +74,7 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function itLogsOutAUser()
+    public function it_logs_out_a_user()
     {
         $user = User::factory()->create();
 
@@ -93,7 +93,7 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function itReturnsTheLoggedInUser()
+    public function it_returns_the_logged_in_user()
     {
         $user = User::factory()->create();
 
@@ -114,7 +114,7 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function itDeletesTheLoggedInUser()
+    public function it_deletes_the_logged_in_user()
     {
         $user = User::factory()->create();
 
@@ -137,7 +137,7 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function itEditsUserDetails()
+    public function it_edits_user_details()
     {
         $user = User::factory()->create();
 
@@ -170,7 +170,7 @@ class UserEndpointsTest extends TestCase
     }
 
     /** @test */
-    public function itAllowsPasswordReset()
+    public function it_allows_password_reset()
     {
         $user = User::factory()->create();
 
