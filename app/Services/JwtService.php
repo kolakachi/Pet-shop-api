@@ -4,13 +4,10 @@ namespace App\Services;
 
 use App\Models\JwtToken;
 use App\Models\User;
-use DateTimeImmutable;
-use Exception;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token\Plain;
-use Lcobucci\JWT\Token;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 
 class JwtService
@@ -28,7 +25,7 @@ class JwtService
         );
     }
 
-    public function generateToken(User $user, string $tokenTitle = null, array $restrictions = null, array $permissions = null): Plain
+    public function generateToken(User $user, ?string $tokenTitle = null, ?array $restrictions = null, ?array $permissions = null): Plain
     {
         $token = $this->buildToken($user);
 
@@ -55,7 +52,7 @@ class JwtService
             new SignedWith($this->config->signer(), $this->config->verificationKey()),
         ];
         $jwtToken = JwtToken::where('unique_id', $token->claims()->get('user_uuid'))->first();
-        if (!$jwtToken) {
+        if (! $jwtToken) {
             return false;
         }
 
@@ -70,12 +67,13 @@ class JwtService
     public function getUserFromToken(string $token): ?User
     {
         $parsedToken = $this->parseToken($token);
-        if (!$this->validateToken($parsedToken)) {
+        if (! $this->validateToken($parsedToken)) {
             return null;
         }
 
         $userId = $parsedToken->claims()->get('user_uuid');
-        return User::where('uuid',$userId)->first();
+
+        return User::where('uuid', $userId)->first();
     }
 
     public function generateTokenForPasswordReset(User $user)

@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use Exception;
-use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
-use App\Services\JwtService;
 use App\Models\User;
+use App\Services\JwtService;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 /**
@@ -18,7 +18,6 @@ use Illuminate\Support\Str;
  *     name="User",
  *     description="User API endpoint"
  * )
- *
  */
 class UserController extends Controller
 {
@@ -34,14 +33,18 @@ class UserController extends Controller
      *     path="/api/v1/user/create",
      *     summary="Create User account",
      *     tags={"User"},
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         content={
+     *
      *             @OA\MediaType(
      *                 mediaType="application/x-www-form-urlencoded",
+     *
      *                 @OA\Schema(
      *                     type="object",
      *                     required={"first_name", "last_name", "email", "password", "password_confirmation", "address", "phone_number"},
+     *
      *                     @OA\Property(property="first_name", type="string", description="The user's first name", example="" ),
      *                     @OA\Property(property="last_name", type="string", description="The user's last name", example="" ),
      *                     @OA\Property(property="email", type="string", format="email", description="The user's email address", example="" ),
@@ -55,10 +58,13 @@ class UserController extends Controller
      *             )
      *         }
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Ok",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="integer", example=1),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="uuid", type="string"),
@@ -78,11 +84,14 @@ class UserController extends Controller
      *             @OA\Property(property="extra", type="object", example={})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Unprocessable Entity",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -90,11 +99,14 @@ class UserController extends Controller
      *             @OA\Property(property="extra", type="object", example={})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -108,17 +120,19 @@ class UserController extends Controller
     {
         try {
             $validated = $request->validated();
-            $validated["password"] = Hash::make($validated["password"]);
-            $validated["uuid"] = Str::uuid()->toString();
+            $validated['password'] = Hash::make($validated['password']);
+            $validated['uuid'] = Str::uuid()->toString();
             $user = User::create($validated);
             $token = $this->jwtService->generateToken($user);
-            $user["token"] = $token->toString();
+            $user['token'] = $token->toString();
 
             $data = $this->getJsonResponseData(1, $user->toArray());
+
             return response()->json($data, 200);
 
         } catch (Exception $error) {
-            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
             return response()->json($data, 500);
         }
 
@@ -129,36 +143,46 @@ class UserController extends Controller
      *     path="/api/v1/user/login",
      *     summary="Login a user",
      *     tags={"User"},
+     *
      *     @OA\RequestBody(
      *         required=true,
      *         content={
+     *
      *             @OA\MediaType(
      *                 mediaType="application/x-www-form-urlencoded",
+     *
      *                 @OA\Schema(
      *                      type="object",
      *                      required={"email", "password"},
+     *
      *                      @OA\Property(property="email", type="string", format="email", description="The user's email address", example="" ),
      *                      @OA\Property(property="password", type="string", description="The user's password", example="" )
      *                  )
      *             )
      *         }
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Login successful",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer"),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="token", type="string", description="JWT token")
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -166,11 +190,14 @@ class UserController extends Controller
      *             @OA\Property(property="extra", type="object", example={})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -183,23 +210,26 @@ class UserController extends Controller
     public function login(Request $request): JsonResponse
     {
         try {
-            $credentials = $request->only("email", "password");
-            $user = User::where("email", $credentials["email"])->first();
+            $credentials = $request->only('email', 'password');
+            $user = User::where('email', $credentials['email'])->first();
 
-            if ($user && Hash::check($credentials["password"], $user->password)) {
+            if ($user && Hash::check($credentials['password'], $user->password)) {
                 $token = $this->jwtService->generateToken($user);
 
                 $data = $this->getJsonResponseData(1, [
-                    "token" => $token->toString(),
+                    'token' => $token->toString(),
                 ]);
+
                 return response()->json($data, 200);
             }
 
-            $data = $this->getJsonResponseData(0, [], "Unauthorized");
+            $data = $this->getJsonResponseData(0, [], 'Unauthorized');
+
             return response()->json($data, 401);
 
-        }catch (Exception $error) {
-            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+        } catch (Exception $error) {
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
             return response()->json($data, 500);
         }
 
@@ -215,20 +245,26 @@ class UserController extends Controller
      *     security={
      *         {"bearerAuth": {}}
      *     },
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successfully logged out",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="integer", example=1),
      *             @OA\Property(property="data", type="array", @OA\Items(type="string")),
      *             @OA\Property(property="message", type="string", nullable=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -236,11 +272,14 @@ class UserController extends Controller
      *             @OA\Property(property="extra", type="object", example={})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -254,8 +293,9 @@ class UserController extends Controller
     {
         try {
             $token = $request->bearerToken();
-            if (!$token) {
-                $data = $this->getJsonResponseData(0, [], "Unauthorized");
+            if (! $token) {
+                $data = $this->getJsonResponseData(0, [], 'Unauthorized');
+
                 return response()->json($data, 401);
             }
 
@@ -263,9 +303,11 @@ class UserController extends Controller
             $this->jwtService->deleteToken($parsedToken);
 
             $data = $this->getJsonResponseData(1);
+
             return response()->json($data, 200);
         } catch (Exception $error) {
-            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
             return response()->json($data, 500);
         }
     }
@@ -280,10 +322,13 @@ class UserController extends Controller
      *     security={
      *         {"bearerAuth": {}}
      *     },
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successfully retrieved user data",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="integer", example=1),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="id", type="integer", example=1),
@@ -298,11 +343,14 @@ class UserController extends Controller
      *             @OA\Property(property="message", type="string", nullable=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -310,11 +358,14 @@ class UserController extends Controller
      *             @OA\Property(property="extra", type="object", example={})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -326,19 +377,22 @@ class UserController extends Controller
      */
     public function getUser(): JsonResponse
     {
-        try{
+        try {
             $token = request()->bearerToken();
             $user = $this->jwtService->getUserFromToken($token);
-            if (!$user) {
-                $data = $this->getJsonResponseData(0, [], "Unauthorized");
+            if (! $user) {
+                $data = $this->getJsonResponseData(0, [], 'Unauthorized');
+
                 return response()->json($data, 401);
             }
 
             $data = $this->getJsonResponseData(1, $user->toArray());
+
             return response()->json($data, 200);
 
-        }catch (Exception $error) {
-            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+        } catch (Exception $error) {
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
             return response()->json($data, 500);
         }
     }
@@ -353,20 +407,26 @@ class UserController extends Controller
      *     security={
      *         {"bearerAuth": {}}
      *     },
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successfully deleted user",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="integer", example=1),
      *             @OA\Property(property="data", type="array", @OA\Items(type="string")),
      *             @OA\Property(property="message", type="string", nullable=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -374,11 +434,14 @@ class UserController extends Controller
      *             @OA\Property(property="extra", type="object", example={})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -390,11 +453,12 @@ class UserController extends Controller
      */
     public function deleteUser(): JsonResponse
     {
-        try{
+        try {
             $token = request()->bearerToken();
             $user = $this->jwtService->getUserFromToken($token);
-            if (!$user) {
-                $data = $this->getJsonResponseData(0, [], "Unauthorized");
+            if (! $user) {
+                $data = $this->getJsonResponseData(0, [], 'Unauthorized');
+
                 return response()->json($data, 401);
             }
 
@@ -403,9 +467,11 @@ class UserController extends Controller
 
             $user->delete();
             $data = $this->getJsonResponseData(1);
+
             return response()->json($data, 200);
-        }catch (Exception $error) {
-            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+        } catch (Exception $error) {
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
             return response()->json($data, 500);
         }
 
@@ -421,10 +487,13 @@ class UserController extends Controller
      *     security={
      *         {"bearerAuth": {}}
      *     },
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"first_name", "last_name", "email", "address", "phone_number"},
+     *
      *             @OA\Property(property="first_name", type="string", example="John"),
      *             @OA\Property(property="last_name", type="string", example="Doe"),
      *             @OA\Property(property="email", type="string", example="john.doe@example.com"),
@@ -434,10 +503,13 @@ class UserController extends Controller
      *             @OA\Property(property="avatar", type="string", nullable=true, example="avatar.png")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Successfully updated user details",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="integer", example=1),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="first_name", type="string", example="John"),
@@ -451,11 +523,14 @@ class UserController extends Controller
      *             @OA\Property(property="message", type="string", nullable=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -463,11 +538,14 @@ class UserController extends Controller
      *             @OA\Property(property="extra", type="object", example={})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -479,19 +557,22 @@ class UserController extends Controller
      */
     public function edit(UserRequest $request): JsonResponse
     {
-        try{
+        try {
             $token = request()->bearerToken();
             $user = $this->jwtService->getUserFromToken($token);
-            if (!$user) {
-                $data = $this->getJsonResponseData(0, [], "Unauthorized");
+            if (! $user) {
+                $data = $this->getJsonResponseData(0, [], 'Unauthorized');
+
                 return response()->json($data, 401);
             }
             $user->update($request->validated());
             $data = $this->getJsonResponseData(1, $user->toArray());
+
             return response()->json($data, 200);
 
         } catch (Exception $error) {
-            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
             return response()->json($data, 500);
         }
     }
@@ -503,17 +584,23 @@ class UserController extends Controller
      *     description="Generates a password reset token for the user",
      *     operationId="forgotPassword",
      *     tags={"User"},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"email"},
+     *
      *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Password reset token generated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="integer", example=1),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="reset_token", type="string", example="token_value")
@@ -521,11 +608,14 @@ class UserController extends Controller
      *             @OA\Property(property="message", type="string", nullable=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Unprocessable Entity",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -533,20 +623,26 @@ class UserController extends Controller
      *             @OA\Property(property="extra", type="object", example={})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="User not found",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="array", @OA\Items(type="string")),
      *             @OA\Property(property="message", type="string", example="User not found")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -558,34 +654,37 @@ class UserController extends Controller
      */
     public function forgotPassword(Request $request): JsonResponse
     {
-        try{
+        try {
             $validator = Validator::make($request->all(), [
                 'email' => 'required|email|exists:users,email',
             ]);
             if ($validator->fails()) {
                 $data = $this->getJsonResponseData(
                     0, [],
-                    "Failed Validation",
+                    'Failed Validation',
                     $validator->errors()->toArray()
                 );
+
                 return response()->json($data, 422);
             }
 
             $user = User::where('email', $request->email)->first();
-            if (!$user) {
-                $data = $this->getJsonResponseData(0, [], "User not found");
+            if (! $user) {
+                $data = $this->getJsonResponseData(0, [], 'User not found');
+
                 return response()->json($data, 404);
             }
 
             $token = $this->jwtService->generateTokenForPasswordReset($user);
             $data = $this->getJsonResponseData(1, [
-                "reset_token" => $token->toString(),
+                'reset_token' => $token->toString(),
             ]);
 
             return response()->json($data, 200);
 
-        }catch (Exception $error) {
-            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+        } catch (Exception $error) {
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
             return response()->json($data, 500);
         }
     }
@@ -597,20 +696,26 @@ class UserController extends Controller
      *     description="Resets the password using a reset token",
      *     operationId="resetPasswordToken",
      *     tags={"User"},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"token", "email", "password", "password_confirmation"},
+     *
      *             @OA\Property(property="token", type="string", example="reset_token_value"),
      *             @OA\Property(property="email", type="string", format="email", example="john.doe@example.com"),
      *             @OA\Property(property="password", type="string", format="password", example="new_password"),
      *             @OA\Property(property="password_confirmation", type="string", format="password", example="new_password")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=200,
      *         description="Password has been successfully updated",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="integer", example=1),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="message", type="string", example="Password has been successfully updated")
@@ -618,11 +723,14 @@ class UserController extends Controller
      *             @OA\Property(property="message", type="string", nullable=true)
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Unprocessable Entity",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -630,20 +738,26 @@ class UserController extends Controller
      *             @OA\Property(property="extra", type="object", example={})
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=404,
      *         description="User not found",
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="array", @OA\Items(type="string")),
      *             @OA\Property(property="message", type="string", example="User not found")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
+     *
      *         @OA\JsonContent(
      *             type="object",
+     *
      *             @OA\Property(property="success", type="integer", example=0),
      *             @OA\Property(property="data", type="object", example={}),
      *             @OA\Property(property="error", type="string", example=""),
@@ -661,14 +775,15 @@ class UserController extends Controller
                 'token' => 'required',
                 'email' => 'required|email|exists:users,email',
                 'password' => 'required|string|min:8',
-                "password_confirmation" => "required|same:password",
+                'password_confirmation' => 'required|same:password',
             ]);
             if ($validator->fails()) {
                 $data = $this->getJsonResponseData(
                     0, [],
-                    "Failed Validation",
+                    'Failed Validation',
                     $validator->errors()->toArray()
                 );
+
                 return response()->json($data, 422);
             }
 
@@ -677,35 +792,36 @@ class UserController extends Controller
             $userId = $parsedToken->claims()->get('user_uuid');
 
             $user = User::where('uuid', $userId)->where('email', $request->email)->first();
-            if (!$user) {
-                $data = $this->getJsonResponseData( 0, [], "User not found");
+            if (! $user) {
+                $data = $this->getJsonResponseData(0, [], 'User not found');
+
                 return response()->json($data, 404);
             }
             $user->password = Hash::make($request->password);
             $user->save();
 
             $data = $this->getJsonResponseData(1, [
-                "message" => "Password has been successfully updated",
+                'message' => 'Password has been successfully updated',
             ]);
 
             return response()->json($data, 200);
         } catch (\Exception $error) {
-            $data = $this->getJsonResponseData(0,[], $error->getMessage());
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
             return response()->json($data, 500);
         }
     }
 
     protected function getJsonResponseData(
         int $success, array $data = [],
-        string $error = "", array $errors = [], array $extra = []): array
+        string $error = '', array $errors = [], array $extra = []): array
     {
         return [
-            "success" => $success,
-            "data" => $data,
-            "error" => $error,
-            "errors" => $errors,
-            "extra" => $extra
+            'success' => $success,
+            'data' => $data,
+            'error' => $error,
+            'errors' => $errors,
+            'extra' => $extra,
         ];
     }
-
 }

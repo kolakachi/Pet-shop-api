@@ -2,9 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\JwtService;
 use Closure;
 use Exception;
-use App\Services\JwtService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -25,13 +25,13 @@ class JwtMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $token = $request->bearerToken();
-        if (!$token) {
+        if (! $token) {
             return response()->json(['error' => 'Token not provided'], 401);
         }
 
         try {
             $user = $this->jwtService->getUserFromToken($token);
-            if (!$user) {
+            if (! $user) {
                 return response()->json(['error' => 'Unauthorized'], 401);
             }
             $request->attributes->set('user', $user);

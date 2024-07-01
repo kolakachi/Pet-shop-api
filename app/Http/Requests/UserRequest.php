@@ -2,16 +2,14 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use \Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -20,23 +18,21 @@ class UserRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
-        $rules =  [
-            "first_name" => "required|string|max:255",
-            "last_name" => "required|string|max:255",
-            "email" => "required|string|email|max:255|unique:users",
-            "password" => "required|string|min:8",
-            "password_confirmation" => "required|same:password",
-            "address" => "required|string|max:255",
-            "phone_number" => "required|string|max:20",
+        $rules = [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'password_confirmation' => 'required|same:password',
+            'address' => 'required|string|max:255',
+            'phone_number' => 'required|string|max:20',
         ];
-        $user = request()->attributes->get("user");
-        if($user){
-            $rules["email"] = "required|string|email|max:255|unique:users,email," . $user->id;
+        $user = request()->attributes->get('user');
+        if ($user) {
+            $rules['email'] = 'required|string|email|max:255|unique:users,email,'.$user->id;
         }
 
         return $rules;
@@ -48,11 +44,11 @@ class UserRequest extends FormRequest
 
         throw new HttpResponseException(
             response()->json([
-                "success" => 0,
-                "data" => [],
-                "error" => "Failed Validation",
-                "errors" => $errors,
-                "extra" => [],
+                'success' => 0,
+                'data' => [],
+                'error' => 'Failed Validation',
+                'errors' => $errors,
+                'extra' => [],
             ], 422)
         );
     }

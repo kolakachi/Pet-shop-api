@@ -1,9 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\JwtMiddleware;
 use App\Http\Controllers\Api\UserController;
-
+use App\Http\Middleware\JwtMiddleware;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     Route::middleware([JwtMiddleware::class])->group(function () {
