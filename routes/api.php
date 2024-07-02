@@ -38,5 +38,6 @@ Route::prefix('v1')->group(function () {
     Route::middleware([AdminMiddleware::class])->group(function () {
         Route::get('categories', [CategoryController::class, 'index']);
         Route::get('category/{uuid}', [CategoryController::class, 'get']);
+        Route::post('category/create', [CategoryController::class, 'store']);
     });
 });

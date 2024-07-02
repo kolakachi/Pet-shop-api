@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 /**
  * @OA\Tag(
@@ -113,6 +115,59 @@ class CategoryController extends Controller
 
             return response()->json($data, 404);
         }
+
+        $data = $this->getJsonResponseData(1, $category->toArray());
+
+        return response()->json($data, 200);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/category/create",
+     *     tags={"Categories"},
+     *     summary="Create a new category",
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *
+     *             @OA\Schema(
+     *                 required={"title", "slug"},
+     *
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="slug", type="string")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Category created successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     )
+     * )
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:categories,slug',
+        ]);
+
+        $category = Category::create([
+            'uuid' => (string) Str::uuid(),
+            'title' => $request->title,
+            'slug' => $request->slug,
+        ]);
 
         $data = $this->getJsonResponseData(1, $category->toArray());
 

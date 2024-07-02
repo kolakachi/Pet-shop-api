@@ -36,6 +36,20 @@ class CategoryEndpointsTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /** @test */
+    public function admin_can_create_category()
+    {
+        $data = [
+            'title' => 'New Category',
+            'slug' => 'new-category',
+        ];
+
+        $token = $this->getToken();
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/v1/category/create', $data);
+        $response->assertStatus(200);
+    }
+
     protected function getToken(): string
     {
         $user = User::factory()->create(['is_admin' => true]);
