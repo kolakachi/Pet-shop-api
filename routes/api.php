@@ -46,6 +46,7 @@ Route::prefix('v1')->group(function () {
 
         Route::post('/product/create', [ProductController::class, 'store']);
         Route::put('/product/{uuid}', [ProductController::class, 'update']);
+        Route::delete('/product/{uuid}', [ProductController::class, 'delete']);
     });
 
     Route::get('/products', [ProductController::class, 'index']);

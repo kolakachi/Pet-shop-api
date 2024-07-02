@@ -102,4 +102,23 @@ class ProductEndpointsTest extends TestCase
 
         $this->assertDatabaseHas('products', ['title' => 'Updated Product Title']);
     }
+
+    /** @test */
+    public function it_can_delete_a_product()
+    {
+        $product = Product::factory()->create();
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $token = $this->jwtService->generateToken($admin);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$token->toString())
+            ->deleteJson("/api/v1/product/{$product->uuid}");
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'message' => 'Product deleted successfully',
+                ],
+            ]);
+    }
 }

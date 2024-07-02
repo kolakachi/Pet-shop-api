@@ -984,6 +984,41 @@
                         "description": "Forbidden"
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Delete a product by UUID",
+                "operationId": "0d001dde3117296c19230e66a6c92684",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
             }
         },
         "/api/v1/user/create": {

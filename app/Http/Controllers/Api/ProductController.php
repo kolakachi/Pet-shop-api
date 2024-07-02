@@ -266,4 +266,54 @@ class ProductController extends Controller
 
         return response()->json($data, 200);
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/product/{uuid}",
+     *     tags={"Products"},
+     *     summary="Delete a product by UUID",
+     *
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product deleted successfully",
+     *
+     *         @OA\JsonContent(type="object")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     )
+     * )
+     */
+    public function delete($uuid): JsonResponse
+    {
+        $product = Product::where('uuid', $uuid)->first();
+
+        if (! $product) {
+            $data = $this->getJsonResponseData(0, [], 'Product not found');
+
+            return response()->json($data, 404);
+        }
+
+        $product->delete();
+
+        $data = $this->getJsonResponseData(1, [
+            'message' => 'Product deleted successfully',
+        ]);
+
+        return response()->json($data, 200);
+    }
 }
