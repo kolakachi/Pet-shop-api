@@ -39,6 +39,26 @@ class AdminEndpointsTest extends TestCase
             ]);
     }
 
+    /** @test */
+    public function it_can_login_as_admin()
+    {
+        $admin = User::factory()->create([
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password'),
+            'is_admin' => true,
+        ]);
+
+        $response = $this->postJson('/api/v1/admin/login', [
+            'email' => $admin->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => ['token']
+            ]);
+    }
+
     private function getUserData(): array
     {
         return [

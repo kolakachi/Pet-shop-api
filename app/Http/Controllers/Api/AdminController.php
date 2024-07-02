@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminCreateRequest;
+use App\Http\Requests\AdminLoginRequest;
 use App\Models\User;
 use App\Services\JwtService;
 use Exception;
@@ -85,6 +86,31 @@ class AdminController extends Controller
 
             return response()->json($data, 200);
 
+        } catch (Exception $error) {
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
+            return response()->json($data, 500);
+        }
+    }
+
+    public function login(AdminLoginRequest $request): JsonResponse
+    {
+        try {
+            $credentials = $request->only('email', 'password');
+            $user = User::where('email', $credentials['email'])->first();
+
+            if ($user && Hash::check($credentials['password'], $user->password) && $user->is_admin) {
+                $token = $this->jwtService->generateToken($user);
+
+                $data = $this->getJsonResponseData(1, [
+                    'token' => $token->toString(),
+                ]);
+
+                return response()->json($data, 200);
+            }
+            $data = $this->getJsonResponseData(0, [], 'Unauthorized');
+
+            return response()->json($data, 401);
         } catch (Exception $error) {
             $data = $this->getJsonResponseData(0, [], $error->getMessage());
 
