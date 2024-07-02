@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/create', [AdminController::class, 'create']);
             Route::get('/logout', [AdminController::class, 'logout']);
             Route::get('/user-listing', [AdminController::class, 'userListing']);
+            Route::put('/user-edit/{uuid}', [AdminController::class, 'editUser']);
         });
     });
 });

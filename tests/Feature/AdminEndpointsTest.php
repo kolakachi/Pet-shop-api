@@ -89,6 +89,24 @@ class AdminEndpointsTest extends TestCase
             ->assertJsonStructure(['data']);
     }
 
+    /** @test */
+    public function it_can_edit_a_user()
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $user = User::factory()->create(['is_admin' => false]);
+        $token = $this->jwtService->generateToken($admin);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$token->toString())
+            ->putJson('/api/v1/admin/user-edit/'.$user->uuid, [
+                'first_name' => 'UpdatedName',
+            ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('users', [
+            'first_name' => 'UpdatedName',
+        ]);
+    }
+
     private function getUserData(): array
     {
         return [

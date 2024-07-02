@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminCreateRequest;
 use App\Http\Requests\AdminLoginRequest;
+use App\Http\Requests\UserEditRequest;
 use App\Models\User;
 use App\Services\JwtService;
 use Exception;
@@ -265,5 +266,27 @@ class AdminController extends Controller
         ]);
 
         return response()->json($data, 200);
+    }
+
+    public function editUser(UserEditRequest $request, $uuid): JsonResponse
+    {
+        try {
+            $user = User::where('uuid', $uuid)->where('is_admin', false)->first();
+
+            if (! $user) {
+                $data = $this->getJsonResponseData(0, [], 'User not found');
+
+                return response()->json($data, 404);
+            }
+            $user->update($request->validated());
+            $data = $this->getJsonResponseData(1, $user->toArray());
+
+            return response()->json($data, 200);
+
+        } catch (Exception $error) {
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
+            return response()->json($data, 500);
+        }
     }
 }
