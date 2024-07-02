@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\FileController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\JwtMiddleware;
@@ -42,5 +43,8 @@ Route::prefix('v1')->group(function () {
         Route::put('category/{uuid}', [CategoryController::class, 'update']);
         Route::patch('category/{uuid}', [CategoryController::class, 'update']);
         Route::delete('category/{uuid}', [CategoryController::class, 'delete']);
+
     });
+
+    Route::get('/products', [ProductController::class, 'index']);
 });
