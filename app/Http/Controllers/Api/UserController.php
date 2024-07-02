@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserRequest;
+use App\Models\Order;
 use App\Models\PasswordReset;
 use App\Models\User;
 use App\Services\JwtService;
@@ -822,6 +823,101 @@ class UserController extends Controller
 
             return response()->json($data, 200);
         } catch (\Exception $error) {
+            $data = $this->getJsonResponseData(0, [], $error->getMessage());
+
+            return response()->json($data, 500);
+        }
+    }
+
+    /**
+     * Get orders for logged in user.
+     *
+     * @OA\Get(
+     *     path="/api/v1/user/orders",
+     *     tags={"User"},
+     *     summary="Get user's orders",
+     *     description="Returns a list of orders for logged in user",
+     *     operationId="getUserOrders",
+     *     security={{"bearerAuth": {}}},
+     *
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         required=false,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="sort_by",
+     *         in="query",
+     *         required=false,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="desc",
+     *         in="query",
+     *         required=false,
+     *
+     *         @OA\Schema(type="boolean")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Ok",
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *     )
+     * )
+     */
+    public function getOrders(Request $request)
+    {
+
+        try {
+            $token = request()->bearerToken();
+            $user = $this->jwtService->getUserFromToken($token);
+            if (! $user) {
+                $data = $this->getJsonResponseData(0, [], 'Unauthorized');
+
+                return response()->json($data, 401);
+            }
+
+            $query = Order::where('user_id', $user->id);
+
+            if ($request->has('sort_by')) {
+                $sortBy = $request->query('sort_by', 'created_at');
+                $desc = $request->query('desc', 'false') === 'true';
+                $query = $query->orderBy($sortBy, $desc ? 'desc' : 'asc');
+            }
+
+            $limit = $request->query('limit', 15);
+            $orders = $query->paginate($limit);
+
+            $data = $this->getJsonResponseData(1, [
+                'orders' => $orders,
+            ]);
+
+            return response()->json($data, 200);
+
+        } catch (Exception $error) {
             $data = $this->getJsonResponseData(0, [], $error->getMessage());
 
             return response()->json($data, 500);

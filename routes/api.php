@@ -15,6 +15,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('user', [UserController::class, 'deleteUser']);
         Route::put('user/edit', [UserController::class, 'edit']);
         Route::get('user/logout', [UserController::class, 'logout']);
+        Route::get('user/orders', [UserController::class, 'getOrders']);
 
         Route::post('file/upload', [FileController::class, 'upload']);
         Route::get('file/{uuid}', [FileController::class, 'download']);

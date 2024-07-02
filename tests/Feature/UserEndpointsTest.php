@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Order;
 use App\Models\User;
 use App\Services\JwtService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -206,6 +207,23 @@ class UserEndpointsTest extends TestCase
             ]);
 
         $this->assertTrue(Hash::check('newpassword', $user->fresh()->password));
+    }
+
+    /** @test */
+    public function it_gets_user_orders()
+    {
+        $user = User::factory()->create();
+
+        $token = $this->authenticate($user);
+        $orders = Order::factory()->count(25)->create(['user_id' => $user->id]);
+
+        $response = $this->getJson('/api/v1/user/orders?page=1&limit=10&sort_by=created_at&desc=true',
+            ['Authorization' => "Bearer {$token}"]
+        );
+
+        $response->assertStatus(200)
+            ->assertJsonFragment(['user_id' => $user->id])
+            ->assertJsonCount(10, 'data.orders.data');
     }
 
     protected function authenticate(User $user): string
