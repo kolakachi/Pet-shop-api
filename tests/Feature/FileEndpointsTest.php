@@ -85,6 +85,28 @@ class FileEndpointsTest extends TestCase
         $response->assertHeader('content-disposition', 'attachment; filename=test-image.jpg');
     }
 
+    /** @test */
+    public function it_validates_image_upload()
+    {
+        $token = $this->getToken();
+        $response = $this->postJson('/api/v1/file/upload', [
+            'file' => 'not-an-image',
+        ], [
+            'Authorization' => "Bearer {$token}",
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'success' => 0,
+            'data' => [],
+            'error' => 'Failed Validation',
+            'errors' => [
+                'The file field must be an image.',
+            ],
+            'extra' => [],
+        ]);
+    }
+
     protected function getToken(): string
     {
         $user = User::factory()->create();
