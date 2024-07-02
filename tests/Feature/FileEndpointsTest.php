@@ -59,6 +59,32 @@ class FileEndpointsTest extends TestCase
         Storage::assertExists(File::first()->path);
     }
 
+    /** @test */
+    public function it_can_download_an_image()
+    {
+        $token = $this->getToken();
+        Storage::fake('pet-shop');
+
+        $file = UploadedFile::fake()->image('test-image.jpg');
+        $path = $file->store('pet-shop');
+        $uuid = \Illuminate\Support\Str::uuid()->toString();
+
+        File::create([
+            'uuid' => $uuid,
+            'name' => 'test-image.jpg',
+            'path' => $path,
+            'size' => $file->getSize(),
+            'type' => $file->getMimeType(),
+        ]);
+
+        $response = $this->getJson("/api/v1/file/{$uuid}", [
+            'Authorization' => "Bearer {$token}",
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertHeader('content-disposition', 'attachment; filename=test-image.jpg');
+    }
+
     protected function getToken(): string
     {
         $user = User::factory()->create();

@@ -13,6 +13,7 @@ Route::prefix('v1')->group(function () {
         Route::get('user/logout', [UserController::class, 'logout']);
 
         Route::post('file/upload', [FileController::class, 'upload']);
+        Route::get('file/{uuid}', [FileController::class, 'download']);
     });
     Route::post('user/create', [UserController::class, 'create']);
     Route::post('user/login', [UserController::class, 'login']);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UploadFileRequest;
 use App\Models\File;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -119,5 +120,12 @@ class FileController extends Controller
 
             return response()->json($data, 500);
         }
+    }
+
+    public function download($uuid)
+    {
+        $file = File::where('uuid', $uuid)->firstOrFail();
+
+        return Storage::download($file->path, $file->name);
     }
 }
