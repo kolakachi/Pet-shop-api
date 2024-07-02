@@ -154,6 +154,28 @@
                 }
             }
         },
+        "/api/v1/admin/logout": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Logout an admin account",
+                "operationId": "516773b68cf66704cd5a9a3fb1afe048",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/file/upload": {
             "post": {
                 "tags": [

@@ -126,6 +126,7 @@ class AdminController extends Controller
      *             @OA\Property(property="token", type="string")
      *         )
      *     ),
+     *
      *     @OA\Response(
      *         response=422,
      *         description="Unprocessable Entity"
@@ -165,6 +166,23 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/v1/admin/logout",
+     *     summary="Logout an admin account",
+     *     tags={"Admin"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logout successful"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function logout(): JsonResponse
     {
         $token = request()->bearerToken();
