@@ -50,6 +50,18 @@ class CategoryEndpointsTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /** @test */
+    public function admin_can_update_category()
+    {
+        $data = ['title' => 'Updated Category'];
+
+        $token = $this->getToken();
+        $category = Category::factory()->create();
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->putJson('/api/v1/category/'.$category->uuid, $data);
+        $response->assertStatus(200);
+    }
+
     protected function getToken(): string
     {
         $user = User::factory()->create(['is_admin' => true]);

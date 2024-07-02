@@ -173,4 +173,66 @@ class CategoryController extends Controller
 
         return response()->json($data, 200);
     }
+
+    /**
+     * @OA\Put(
+     *     path="/api/v1/category/{uuid}",
+     *     tags={"Categories"},
+     *     summary="Update a category by UUID",
+     *
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *
+     *             @OA\Schema(
+     *
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="slug", type="string")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category updated successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found"
+     *     )
+     * )
+     */
+    public function update(Request $request, $uuid)
+    {
+        $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'slug' => 'sometimes|required|string|max:255|unique:categories,slug,'.$uuid.',uuid',
+        ]);
+
+        $category = Category::where('uuid', $uuid)->first();
+        if (! $category) {
+            $data = $this->getJsonResponseData(0, [], 'Category not found');
+
+            return response()->json($data, 404);
+        }
+        $category->update($request->only(['title', 'slug']));
+
+        $data = $this->getJsonResponseData(1, $category->toArray());
+
+        return response()->json($data, 200);
+    }
 }
