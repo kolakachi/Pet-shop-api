@@ -16,6 +16,86 @@ use Illuminate\Support\Str;
  */
 class FileController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/v1/file/upload",
+     *     summary="Upload a file",
+     *     tags={"File"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *
+     *             @OA\Schema(
+     *
+     *                 @OA\Property(
+     *                     property="file",
+     *                     type="string",
+     *                     format="binary"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="File uploaded successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="data", type="object", @OA\Property(property="uuid", type="string"))
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(property="success", type="integer", example=0),
+     *             @OA\Property(property="data", type="object", example={}),
+     *             @OA\Property(property="error", type="string", example=""),
+     *             @OA\Property(property="errors", type="object", example={}),
+     *             @OA\Property(property="extra", type="object", example={})
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity",
+     *
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(property="success", type="integer", example=0),
+     *             @OA\Property(property="data", type="object", example={}),
+     *             @OA\Property(property="error", type="string", example=""),
+     *             @OA\Property(property="errors", type="object", example={}),
+     *             @OA\Property(property="extra", type="object", example={})
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(property="success", type="integer", example=0),
+     *             @OA\Property(property="data", type="object", example={}),
+     *             @OA\Property(property="error", type="string", example=""),
+     *             @OA\Property(property="errors", type="object", example={}),
+     *             @OA\Property(property="extra", type="object", example={})
+     *         )
+     *     )
+     * )
+     */
     public function upload(UploadFileRequest $request)
     {
         try {
