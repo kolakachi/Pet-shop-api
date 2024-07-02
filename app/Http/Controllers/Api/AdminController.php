@@ -164,4 +164,17 @@ class AdminController extends Controller
             return response()->json($data, 500);
         }
     }
+
+    public function logout(): JsonResponse
+    {
+        $token = request()->bearerToken();
+        $parsedToken = $this->jwtService->parseToken($token);
+        $this->jwtService->deleteToken($parsedToken);
+
+        $data = $this->getJsonResponseData(1, [
+            'message' => 'Logged out successfully',
+        ]);
+
+        return response()->json($data, 200);
+    }
 }

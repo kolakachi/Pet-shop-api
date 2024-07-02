@@ -26,6 +26,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/login', [AdminController::class, 'login']);
         Route::middleware([AdminMiddleware::class])->group(function () {
             Route::post('/create', [AdminController::class, 'create']);
+            Route::get('/logout', [AdminController::class, 'logout']);
         });
     });
 });

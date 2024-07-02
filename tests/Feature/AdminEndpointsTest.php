@@ -55,7 +55,23 @@ class AdminEndpointsTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure([
-                'data' => ['token']
+                'data' => ['token'],
+            ]);
+    }
+
+    /** @test */
+    public function it_can_logout_as_admin()
+    {
+        $token = $this->getToken();
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->getJson('/api/v1/admin/logout');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'message' => 'Logged out successfully',
+                ],
             ]);
     }
 
