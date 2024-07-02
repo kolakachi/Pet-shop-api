@@ -187,4 +187,83 @@ class ProductController extends Controller
 
         return response()->json($data, 200);
     }
+
+    /**
+     * @OA\Put(
+     *     path="/api/v1/product/{uuid}",
+     *     tags={"Products"},
+     *     summary="Update a product by UUID",
+     *
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *
+     *             @OA\Schema(
+     *
+     *                 @OA\Property(property="category_uuid", type="string"),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="price", type="number", format="float"),
+     *                 @OA\Property(property="description", type="string"),
+     *                 @OA\Property(property="metadata", type="string", format="json")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product updated successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     ),
+     *     @OA\Response(
+     *          response=404,
+     *          description="Product not found"
+     *     ),
+     *     @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *     )
+     *   )
+     */
+    public function update(Request $request, $uuid): JsonResponse
+    {
+        $product = Product::where('uuid', $uuid)->first();
+        if (! $product) {
+            $data = $this->getJsonResponseData(0, [], 'Product not found');
+
+            return response()->json($data, 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'category_uuid' => 'sometimes|required|string|exists:categories,uuid',
+            'title' => 'sometimes|required|string',
+            'price' => 'sometimes|required|numeric',
+            'description' => 'sometimes|required|string',
+            'metadata' => 'sometimes|required|json',
+        ]);
+
+        if ($validator->fails()) {
+            $data = $this->getJsonResponseData(0, $validator->errors()->toArray(), 'Validation error');
+
+            return response()->json($data, 422);
+        }
+
+        $product->update($validator->validated());
+
+        $data = $this->getJsonResponseData(1, $product->toArray());
+
+        return response()->json($data, 200);
+    }
 }

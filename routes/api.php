@@ -45,7 +45,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('category/{uuid}', [CategoryController::class, 'delete']);
 
         Route::post('/product/create', [ProductController::class, 'store']);
-
+        Route::put('/product/{uuid}', [ProductController::class, 'update']);
     });
 
     Route::get('/products', [ProductController::class, 'index']);

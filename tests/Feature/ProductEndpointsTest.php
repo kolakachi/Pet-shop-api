@@ -76,4 +76,30 @@ class ProductEndpointsTest extends TestCase
                 ],
             ]);
     }
+
+    /** @test */
+    public function it_can_update_a_product()
+    {
+        $product = Product::factory()->create();
+
+        $data = [
+            'title' => 'Updated Product Title',
+            'price' => 199.99,
+            'description' => 'Updated product description',
+            'metadata' => json_encode(['brand' => '123e4567-e89b-12d3-a456-426614174002', 'image' => '123e4567-e89b-12d3-a456-426614174003']),
+        ];
+
+        $admin = User::factory()->create(['is_admin' => true]);
+        $token = $this->jwtService->generateToken($admin);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$token->toString())
+            ->putJson("/api/v1/product/{$product->uuid}", $data);
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'title' => 'Updated Product Title',
+            ]);
+
+        $this->assertDatabaseHas('products', ['title' => 'Updated Product Title']);
+    }
 }
