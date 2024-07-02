@@ -347,6 +347,57 @@
                 ]
             }
         },
+        "/api/v1/categories": {
+            "get": {
+                "tags": [
+                    "Categories"
+                ],
+                "summary": "Get a list of categories",
+                "operationId": "52c3c8d702572c2b4347b0ecf7573e54",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "sort_by",
+                        "in": "query",
+                        "description": "Field to sort by",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "desc",
+                        "in": "query",
+                        "description": "Sort in descending order",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A list of categories"
+                    },
+                    "401": {
+                        "description": "UnAuthorized"
+                    }
+                }
+            }
+        },
         "/api/v1/file/upload": {
             "post": {
                 "tags": [
@@ -1805,6 +1856,10 @@
         {
             "name": "Admin",
             "description": "Admin API endpoint"
+        },
+        {
+            "name": "Categories",
+            "description": "API Endpoints for Categories"
         },
         {
             "name": "File",

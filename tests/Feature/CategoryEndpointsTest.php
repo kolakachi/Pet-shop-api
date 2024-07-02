@@ -2,19 +2,35 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Models\User;
+use App\Services\JwtService;
 use Tests\TestCase;
 
 class CategoryEndpointsTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
-    public function test_example(): void
-    {
-        $response = $this->get('/');
+    protected $jwtService;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->jwtService = new JwtService();
+    }
+
+    /** @test */
+    public function admin_can_list_categories()
+    {
+        $token = $this->getToken();
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->getJson('/api/v1/categories');
         $response->assertStatus(200);
+    }
+
+    protected function getToken(): string
+    {
+        $user = User::factory()->create(['is_admin' => true]);
+
+        $token = $this->jwtService->generateToken($user);
+
+        return $token->toString();
     }
 }

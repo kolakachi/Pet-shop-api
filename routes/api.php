@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Middleware\AdminMiddleware;
@@ -32,5 +33,9 @@ Route::prefix('v1')->group(function () {
             Route::put('/user-edit/{uuid}', [AdminController::class, 'editUser']);
             Route::delete('/user-delete/{uuid}', [AdminController::class, 'deleteUser']);
         });
+    });
+
+    Route::middleware([AdminMiddleware::class])->group(function () {
+        Route::get('categories', [CategoryController::class, 'index']);
     });
 });
