@@ -93,6 +93,53 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/v1/admin/login",
+     *     summary="Login an admin account",
+     *     tags={"Admin"},
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *         content={
+     *
+     *            @OA\MediaType(
+     *                 mediaType="application/x-www-form-urlencoded",
+     *
+     *                 @OA\Schema(
+     *                     type="object",
+     *                     required={"email","password"},
+     *
+     *                     @OA\Property(property="email", type="string", format="email"),
+     *                     @OA\Property(property="password", type="string", format="password")
+     *                 )
+     *            )
+     *         }
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login successful",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="token", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Unprocessable Entity"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function login(AdminLoginRequest $request): JsonResponse
     {
         try {
