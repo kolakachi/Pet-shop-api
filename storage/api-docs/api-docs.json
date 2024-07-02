@@ -899,6 +899,33 @@
                 }
             }
         },
+        "/api/v1/product/{uuid}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get a product by UUID",
+                "operationId": "9870dbf60229eba6ee2bb8dc3164ca69",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product details"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    }
+                }
+            }
+        },
         "/api/v1/user/create": {
             "post": {
                 "tags": [

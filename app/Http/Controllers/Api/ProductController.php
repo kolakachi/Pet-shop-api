@@ -148,4 +148,43 @@ class ProductController extends Controller
 
         return response()->json($data, 200);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/product/{uuid}",
+     *     tags={"Products"},
+     *     summary="Get a product by UUID",
+     *
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product details"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Product not found"
+     *     )
+     * )
+     */
+    public function get($uuid): JsonResponse
+    {
+        $product = Product::where('uuid', $uuid)->first();
+
+        if (! $product) {
+            $data = $this->getJsonResponseData(0, [], 'Product not found');
+
+            return response()->json($data, 404);
+        }
+
+        $data = $this->getJsonResponseData(1, $product->toArray());
+
+        return response()->json($data, 200);
+    }
 }

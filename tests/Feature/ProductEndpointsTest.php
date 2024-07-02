@@ -61,4 +61,19 @@ class ProductEndpointsTest extends TestCase
 
         $this->assertDatabaseHas('products', ['title' => 'Test Product']);
     }
+
+    /** @test */
+    public function it_can_get_a_product()
+    {
+        $product = Product::factory()->create();
+
+        $response = $this->getJson("/api/v1/product/{$product->uuid}");
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'title' => $product->title,
+                ],
+            ]);
+    }
 }
