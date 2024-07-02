@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 /**
  * @OA\Tag(
@@ -81,6 +83,68 @@ class ProductController extends Controller
         $data = $this->getJsonResponseData(1, [
             'products' => $products,
         ]);
+
+        return response()->json($data, 200);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/v1/product/create",
+     *     tags={"Products"},
+     *     summary="Create a new product",
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *
+     *             @OA\Schema(
+     *                 required={"category_uuid", "title", "price", "description"},
+     *
+     *                 @OA\Property(property="category_uuid", type="string"),
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="price", type="number", format="float"),
+     *                 @OA\Property(property="description", type="string"),
+     *                 @OA\Property(property="metadata", type="string", format="json")
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Product created successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validation error"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     )
+     * )
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'category_uuid' => 'required|string|exists:categories,uuid',
+            'title' => 'required|string',
+            'price' => 'required|numeric',
+            'description' => 'required|string',
+            'metadata' => 'required|json',
+        ]);
+
+        if ($validator->fails()) {
+            $data = $this->getJsonResponseData(0, $validator->errors()->toArray(), 'Validation error');
+
+            return response()->json($data, 422);
+        }
+        $validated = $validator->validated();
+        $validated['uuid'] = Str::uuid()->toString();
+        $product = Product::create($validated);
+
+        $data = $this->getJsonResponseData(1, $product->toArray());
 
         return response()->json($data, 200);
     }

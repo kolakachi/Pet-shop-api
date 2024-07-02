@@ -44,6 +44,8 @@ Route::prefix('v1')->group(function () {
         Route::patch('category/{uuid}', [CategoryController::class, 'update']);
         Route::delete('category/{uuid}', [CategoryController::class, 'delete']);
 
+        Route::post('/product/create', [ProductController::class, 'store']);
+
     });
 
     Route::get('/products', [ProductController::class, 'index']);
