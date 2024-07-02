@@ -26,5 +26,16 @@ use OpenApi\Annotations as OA;
  */
 abstract class Controller
 {
-    //
+    protected function getJsonResponseData(
+        int $success, array $data = [],
+        string $error = '', array $errors = [], array $extra = []): array
+    {
+        return [
+            'success' => $success,
+            'data' => $data,
+            'error' => $error,
+            'errors' => $errors,
+            'extra' => $extra,
+        ];
+    }
 }

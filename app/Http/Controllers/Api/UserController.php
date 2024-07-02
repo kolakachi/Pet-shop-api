@@ -827,17 +827,4 @@ class UserController extends Controller
             return response()->json($data, 500);
         }
     }
-
-    protected function getJsonResponseData(
-        int $success, array $data = [],
-        string $error = '', array $errors = [], array $extra = []): array
-    {
-        return [
-            'success' => $success,
-            'data' => $data,
-            'error' => $error,
-            'errors' => $errors,
-            'extra' => $extra,
-        ];
-    }
 }
