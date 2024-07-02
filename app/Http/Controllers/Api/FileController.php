@@ -122,6 +122,59 @@ class FileController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/v1/file/{uuid}",
+     *     summary="Download a file",
+     *     tags={"File"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="File downloaded successfully",
+     *
+     *         @OA\Header(header="Content-Disposition", @OA\Schema(type="string"))
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(property="success", type="integer", example=0),
+     *             @OA\Property(property="data", type="object", example={}),
+     *             @OA\Property(property="error", type="string", example=""),
+     *             @OA\Property(property="errors", type="object", example={}),
+     *             @OA\Property(property="extra", type="object", example={})
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error",
+     *
+     *         @OA\JsonContent(
+     *             type="object",
+     *
+     *             @OA\Property(property="success", type="integer", example=0),
+     *             @OA\Property(property="data", type="object", example={}),
+     *             @OA\Property(property="error", type="string", example=""),
+     *             @OA\Property(property="errors", type="object", example={}),
+     *             @OA\Property(property="extra", type="object", example={})
+     *         )
+     *     )
+     * )
+     */
     public function download($uuid)
     {
         $file = File::where('uuid', $uuid)->firstOrFail();
