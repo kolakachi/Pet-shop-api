@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\JwtMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -19,4 +21,10 @@ Route::prefix('v1')->group(function () {
     Route::post('user/login', [UserController::class, 'login']);
     Route::post('user/forgot-password', [UserController::class, 'forgotPassword']);
     Route::post('user/reset-password-token', [UserController::class, 'resetPasswordToken']);
+
+    Route::prefix('admin')->group(function () {
+        Route::middleware([AdminMiddleware::class])->group(function () {
+            Route::post('/create', [AdminController::class, 'create']);
+        });
+    });
 });
