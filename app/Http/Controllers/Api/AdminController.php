@@ -268,6 +268,54 @@ class AdminController extends Controller
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/v1/admin/user-edit/{uuid}",
+     *     summary="Edit a non-admin user's account",
+     *     tags={"Admin"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         description="UUID of the user",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\RequestBody(
+     *         required=true,
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="first_name", type="string"),
+     *             @OA\Property(property="last_name", type="string"),
+     *             @OA\Property(property="email", type="string", format="email"),
+     *             @OA\Property(property="phone_number", type="string"),
+     *             @OA\Property(property="address", type="string"),
+     *             @OA\Property(property="is_marketing", type="boolean")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="User updated successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Internal server error"
+     *     )
+     * )
+     */
     public function editUser(UserEditRequest $request, $uuid): JsonResponse
     {
         try {
