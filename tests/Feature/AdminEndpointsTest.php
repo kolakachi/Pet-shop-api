@@ -75,6 +75,20 @@ class AdminEndpointsTest extends TestCase
             ]);
     }
 
+    /** @test */
+    public function it_can_list_all_non_admin_users()
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        User::factory()->count(10)->create(['is_admin' => false]);
+        $token = $this->jwtService->generateToken($admin);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$token->toString())
+            ->getJson('/api/v1/admin/user-listing');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['data']);
+    }
+
     private function getUserData(): array
     {
         return [

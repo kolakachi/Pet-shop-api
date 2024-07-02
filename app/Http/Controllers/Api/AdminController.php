@@ -195,4 +195,21 @@ class AdminController extends Controller
 
         return response()->json($data, 200);
     }
+
+    public function userListing(): JsonResponse
+    {
+        $perPage = request()->input('limit', 10);
+        $sortBy = request()->input('sort_by', 'created_at');
+        $desc = request()->input('desc', 'true') === 'true' ? 'desc' : 'asc';
+
+        $users = User::where('is_admin', false)
+            ->orderBy($sortBy, $desc)
+            ->paginate($perPage);
+
+        $data = $this->getJsonResponseData(1, [
+            'users' => $users,
+        ]);
+
+        return response()->json($data, 200);
+    }
 }
