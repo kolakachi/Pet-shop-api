@@ -80,4 +80,42 @@ class CategoryController extends Controller
 
         return response()->json($data, 200);
     }
+
+    /**
+     * @OA\Get(
+     *     path="/api/v1/category/{uuid}",
+     *     tags={"Categories"},
+     *     summary="Get a category by UUID",
+     *
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category details"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found"
+     *     )
+     * )
+     */
+    public function get($uuid)
+    {
+        $category = Category::where('uuid', $uuid)->first();
+        if (! $category) {
+            $data = $this->getJsonResponseData(0, [], 'Category not found');
+
+            return response()->json($data, 404);
+        }
+
+        $data = $this->getJsonResponseData(1, $category->toArray());
+
+        return response()->json($data, 200);
+    }
 }
