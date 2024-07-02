@@ -107,6 +107,24 @@ class AdminEndpointsTest extends TestCase
         ]);
     }
 
+    /** @test */
+    public function it_can_delete_a_user()
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $user = User::factory()->create(['is_admin' => false]);
+        $token = $this->jwtService->generateToken($admin);
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$token->toString())
+            ->deleteJson('/api/v1/admin/user-delete/'.$user->uuid);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'message' => 'User deleted successfully',
+                ],
+            ]);
+    }
+
     private function getUserData(): array
     {
         return [

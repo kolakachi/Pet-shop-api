@@ -337,4 +337,22 @@ class AdminController extends Controller
             return response()->json($data, 500);
         }
     }
+
+    public function deleteUser($uuid): JsonResponse
+    {
+        $user = User::where('uuid', $uuid)->where('is_admin', false)->first();
+
+        if (! $user) {
+            $data = $this->getJsonResponseData(0, [], 'User not found');
+
+            return response()->json($data, 404);
+        }
+
+        $user->delete();
+        $data = $this->getJsonResponseData(1, [
+            'message' => 'User deleted successfully',
+        ]);
+
+        return response()->json($data, 200);
+    }
 }
