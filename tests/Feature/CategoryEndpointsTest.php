@@ -62,6 +62,16 @@ class CategoryEndpointsTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /** @test */
+    public function admin_can_delete_category()
+    {
+        $token = $this->getToken();
+        $category = Category::factory()->create();
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->deleteJson('/api/v1/category/'.$category->uuid);
+        $response->assertStatus(200);
+    }
+
     protected function getToken(): string
     {
         $user = User::factory()->create(['is_admin' => true]);

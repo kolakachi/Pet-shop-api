@@ -41,5 +41,6 @@ Route::prefix('v1')->group(function () {
         Route::post('category/create', [CategoryController::class, 'store']);
         Route::put('category/{uuid}', [CategoryController::class, 'update']);
         Route::patch('category/{uuid}', [CategoryController::class, 'update']);
+        Route::delete('category/{uuid}', [CategoryController::class, 'delete']);
     });
 });

@@ -235,4 +235,52 @@ class CategoryController extends Controller
 
         return response()->json($data, 200);
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/category/{uuid}",
+     *     tags={"Categories"},
+     *     summary="Delete a category by UUID",
+     *
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Category deleted successfully",
+     *
+     *         @OA\JsonContent(type="object")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=404,
+     *         description="Category not found"
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Forbidden"
+     *     )
+     * )
+     */
+    public function delete($uuid)
+    {
+        $category = Category::where('uuid', $uuid)->first();
+        if (! $category) {
+            $data = $this->getJsonResponseData(0, [], 'Category not found');
+
+            return response()->json($data, 404);
+        }
+        $category->delete();
+
+        $data = $this->getJsonResponseData(1, [
+            'message' => 'Category deleted successfully',
+        ]);
+
+        return response()->json($data, 200);
+    }
 }
