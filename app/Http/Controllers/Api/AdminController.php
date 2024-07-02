@@ -196,6 +196,59 @@ class AdminController extends Controller
         return response()->json($data, 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/v1/admin/user-listing",
+     *     summary="List all non-admin users with pagination and filters",
+     *     tags={"Admin"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number",
+     *         required=false,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Number of items per page",
+     *         required=false,
+     *
+     *         @OA\Schema(type="integer")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="sort_by",
+     *         in="query",
+     *         description="Sort by field",
+     *         required=false,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\Parameter(
+     *         name="desc",
+     *         in="query",
+     *         description="Sort in descending order",
+     *         required=false,
+     *
+     *         @OA\Schema(type="boolean")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response"
+     *    ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function userListing(): JsonResponse
     {
         $perPage = request()->input('limit', 10);
