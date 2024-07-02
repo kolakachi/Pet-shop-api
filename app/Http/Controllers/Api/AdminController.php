@@ -32,6 +32,7 @@ class AdminController extends Controller
      *     path="/api/v1/admin/create",
      *     summary="Create a new admin account",
      *     tags={"Admin"},
+     *     security={{"bearerAuth":{}}},
      *
      *     @OA\RequestBody(
      *         required=true,
