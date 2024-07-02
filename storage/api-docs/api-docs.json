@@ -297,14 +297,47 @@
                     "401": {
                         "description": "Unauthorized"
                     },
-                    "403": {
-                        "description": "Forbidden"
-                    },
                     "404": {
                         "description": "User not found"
                     },
                     "500": {
                         "description": "Internal server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/user-delete/{uuid}": {
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete a non-admin user's account",
+                "operationId": "4475986cdd2ddfe35049d3a4f9a66752",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "UUID of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "User not found"
                     }
                 },
                 "security": [

@@ -338,6 +338,36 @@ class AdminController extends Controller
         }
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/v1/admin/user-delete/{uuid}",
+     *     summary="Delete a non-admin user's account",
+     *     tags={"Admin"},
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *         name="uuid",
+     *         in="path",
+     *         description="UUID of the user",
+     *         required=true,
+     *
+     *         @OA\Schema(type="string")
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="User deleted successfully"
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     )
+     * )
+     */
     public function deleteUser($uuid): JsonResponse
     {
         $user = User::where('uuid', $uuid)->where('is_admin', false)->first();
