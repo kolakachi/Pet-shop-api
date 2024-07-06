@@ -1,0 +1,14 @@
+{
+    "name": "kola-kachi/bacs",
+    "description": "A Laravel package to render BACS responses.",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "KolaKachi\\Bacs\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.3",
+        "laravel/framework": "^11.0"
+    }
+}
