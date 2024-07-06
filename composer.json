@@ -10,7 +10,8 @@
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9",
         "lcobucci/jwt": "^5.3",
-        "zircote/swagger-php": "^4.10"
+        "zircote/swagger-php": "^4.10",
+        "kola-kachi/bacs": "dev-master"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -63,6 +64,12 @@
             "php-http/discovery": true
         }
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./packages/KolaKachi/Bacs"
+        }
+    ],
     "minimum-stability": "stable",
     "prefer-stable": true
 }

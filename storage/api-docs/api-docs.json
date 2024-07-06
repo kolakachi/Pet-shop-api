@@ -2276,6 +2276,61 @@
                     }
                 ]
             }
+        },
+        "/api/bacs-response": {
+            "get": {
+                "tags": [
+                    "BACS"
+                ],
+                "summary": "Get BACS response",
+                "operationId": "3cdfda70597c33f41b4e02f5dd791b02",
+                "responses": {
+                    "200": {
+                        "description": "BACS response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "vol": {
+                                                    "type": "string"
+                                                },
+                                                "hdr1": {
+                                                    "type": "string"
+                                                },
+                                                "hdr2": {
+                                                    "type": "string"
+                                                },
+                                                "uhl": {
+                                                    "type": "string"
+                                                },
+                                                "standard": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "eof1": {
+                                                    "type": "string"
+                                                },
+                                                "eof2": {
+                                                    "type": "string"
+                                                },
+                                                "utl": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -2307,6 +2362,10 @@
         {
             "name": "User",
             "description": "User API endpoint"
+        },
+        {
+            "name": "BACS",
+            "description": "BACS API endpoint"
         }
     ]
 }
