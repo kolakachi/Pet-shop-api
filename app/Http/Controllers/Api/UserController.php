@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ResetPasswordTokenRequest;
 use App\Http\Requests\UserRequest;
 use App\Models\Order;
 use App\Models\PasswordReset;
@@ -12,7 +15,6 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 /**
@@ -209,7 +211,7 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
         try {
             $credentials = $request->only('email', 'password');
@@ -291,10 +293,10 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(): JsonResponse
     {
         try {
-            $token = $request->bearerToken();
+            $token = request()->bearerToken();
             if (! $token) {
                 $data = $this->getJsonResponseData(0, [], 'Unauthorized');
 
@@ -654,22 +656,9 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function forgotPassword(Request $request): JsonResponse
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'email' => 'required|email|exists:users,email',
-            ]);
-            if ($validator->fails()) {
-                $data = $this->getJsonResponseData(
-                    0, [],
-                    'Failed Validation',
-                    $validator->errors()->toArray()
-                );
-
-                return response()->json($data, 422);
-            }
-
             $user = User::where('email', $request->email)->first();
             if (! $user) {
                 $data = $this->getJsonResponseData(0, [], 'User not found');
@@ -775,36 +764,16 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function resetPasswordToken(Request $request): JsonResponse
+    public function resetPasswordToken(ResetPasswordTokenRequest $request): JsonResponse
     {
         try {
-
-            $validator = Validator::make($request->all(), [
-                'token' => 'required',
-                'email' => 'required|email|exists:users,email',
-                'password' => 'required|string|min:8',
-                'password_confirmation' => 'required|same:password',
-            ]);
-            if ($validator->fails()) {
-                $data = $this->getJsonResponseData(
-                    0, [],
-                    'Failed Validation',
-                    $validator->errors()->toArray()
-                );
-
-                return response()->json($data, 422);
-            }
 
             $token = $request->token;
             $tokenIsValid = PasswordReset::where('token', $token)->first();
             if (! $tokenIsValid) {
-                $data = $this->getJsonResponseData(
-                    0, [],
-                    'Failed Validation',
-                    $validator->errors()->toArray()
-                );
+                $data = $this->getJsonResponseData(0, [], 'Token not found');
 
-                return response()->json($data, 422);
+                return response()->json($data, 404);
             }
 
             $user = User::where('email', $request->email)->first();
@@ -876,12 +845,10 @@ class UserController extends Controller
      *         response=200,
      *         description="Ok",
      *     ),
-     *
      *     @OA\Response(
      *         response=401,
      *         description="Unauthorized"
      *     ),
-     *
      *     @OA\Response(
      *         response=500,
      *         description="Internal server error",
@@ -892,7 +859,7 @@ class UserController extends Controller
     {
 
         try {
-            $token = request()->bearerToken();
+            $token = $request->bearerToken();
             $user = $this->jwtService->getUserFromToken($token);
             if (! $user) {
                 $data = $this->getJsonResponseData(0, [], 'Unauthorized');
