@@ -4,8 +4,44 @@ namespace KolaKachi\Bacs\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 
+/**
+ * @OA\Tag(
+ *     name="BACS",
+ *     description="BACS API endpoint"
+ * )
+ */
 class BacsController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/bacs-response",
+     *     summary="Get BACS response",
+     *     tags={"BACS"},
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="BACS response",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="data", type="object",
+     *                 @OA\Property(property="vol", type="string"),
+     *                 @OA\Property(property="hdr1", type="string"),
+     *                 @OA\Property(property="hdr2", type="string"),
+     *                 @OA\Property(property="uhl", type="string"),
+     *                 @OA\Property(property="standard", type="array",
+     *
+     *                     @OA\Items(type="string")
+     *                 ),
+     *
+     *                 @OA\Property(property="eof1", type="string"),
+     *                 @OA\Property(property="eof2", type="string"),
+     *                 @OA\Property(property="utl", type="string")
+     *             )
+     *         )
+     *     )
+     * )
+     */
     public function getBacsResponse()
     {
         $response = [
