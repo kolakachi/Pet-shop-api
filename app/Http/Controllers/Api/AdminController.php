@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminCreateRequest;
-use App\Http\Requests\AdminLoginRequest;
+use App\Http\Requests\LoginRequest;
 use App\Http\Requests\UserEditRequest;
 use App\Models\User;
 use App\Services\JwtService;
@@ -143,7 +143,7 @@ class AdminController extends Controller
      *     )
      * )
      */
-    public function login(AdminLoginRequest $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
         try {
             $credentials = $request->only('email', 'password');
